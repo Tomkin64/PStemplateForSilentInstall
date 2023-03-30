@@ -26,7 +26,7 @@ $DateFormat = "dd.MM.yyyy HH:mm:ss"
 $Now = (Get-Date -f $DateFormat)
 
 #==============================================
-# NAZEV BALICKU A FORMAT DATA
+# NAZEV BALICKU
 #==============================================
 
 $PackageName = ""
@@ -34,6 +34,7 @@ $PackageName = ""
 #==============================================
 # KONFIGURACE LOGOVANI
 #==============================================
+
 $LogToCSV = $false
 if ($LogToCSV) {
     $LogExt = ".csv"
@@ -49,6 +50,7 @@ if ($PackageName -eq "" -or $PackageName -eq $null) {
 #==============================================
 # FUNKCE
 #==============================================
+
 function LOG {
     [CmdletBinding()]
     param (
@@ -75,6 +77,7 @@ LOG -Message "Start $ScriptFullPath" -Severity INFO
 
 
 function MESSAGE {
+    # Usage: MESSAGE "Folder $ProgramFilesX86\TestFolder created!"
     [CmdletBinding()]
     param (
         [Parameter()]
@@ -85,6 +88,7 @@ function MESSAGE {
     Add-Type -AssemblyName PresentationCore,PresentationFramework
     [System.Windows.MessageBox]::Show($msgBody)
 }
+
 
 function RUN {
     # Usage: RUN "$WinDir\notepad.exe"
@@ -105,6 +109,7 @@ function RUN {
         LOG -Message "Function RUN : Cannot find $FilePath" -Severity ERROR
     }
 }
+
 
 function CREATEFOLDER {
     # Usage: CREATEFOLDER "$ProgramFilesX86\FolderName"
@@ -128,6 +133,24 @@ function CREATEFOLDER {
     }
 }
 
+function DELFOLDER {
+    # Usage: DELFOLDER "$ProgramFilesX86\FolderName"
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [string]$FolderPathForDelete
+    )
+
+    if (Test-Path -Path $FolderPathForDelete) {
+        Remove-Item $FolderPathForDelete -Recurse
+        LOG -Message "Function DELFOLDER : Folder $FolderPathForDelete deleted." -Severity INFO
+    } else {
+        LOG -Message "Function DELFOLDER : Folder $FolderPathForDelete not found!" -Severity WARN
+    }    
+}
+
+
 #==============================================
 # Script
 #==============================================
@@ -136,4 +159,6 @@ function CREATEFOLDER {
 #MESSAGE "Run notepad.exe"
 #RUN "$WinDir\notepad.exe"
 #CREATEFOLDER "$ProgramFilesX86\TestFolder"
+#MESSAGE "Folder $ProgramFilesX86\TestFolder created!"
+#DELFOLDER "$ProgramFilesX86\TestFolder"
 
