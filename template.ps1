@@ -183,9 +183,25 @@ function COPYFILE {
     } else {
         LOG -Message "Function COPYFILE : File $CopyFilePath not found!" -Severity ERROR
     }
-    
 }
 
+function DELFILE {
+    # Usage: DELFOLDER "$ScriptPath\README.pdf"
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [string]$FilePathToDelete
+    )
+    
+    if (Test-Path -Path $FilePathToDelete) {
+        Remove-Item -Path $FilePathToDelete -Force
+        LOG -Message "Function DELFILE : File $FilePathToDelete was deleted." -Severity INFO
+    } else {
+        # TO-DO catch errors
+        LOG -Message "Function DELFILE : File $FilePathToDelete was not found!" -Severity ERROR
+    }
+}
 
 #==============================================
 # Script
@@ -202,5 +218,6 @@ function COPYFILE {
 #MESSAGE $ScriptPath
 #MESSAGE $UserDesktop
 #COPYFILE "$ScriptPath\README.md" $UserDesktop
+DELFILE "$UserDesktop\README.md"
 
 
