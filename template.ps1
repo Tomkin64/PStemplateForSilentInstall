@@ -12,13 +12,16 @@
 #==============================================
 # Seznam vsech systemovych promennych > Get-Childitem -Path Env:* | Sort-Object Name
 $ScriptName = $MyInvocation.MyCommand.Name
-$ScriptFullPath = $MyInvocation.MyCommand.Path
-$ScriptParentFolder = Split-Path (Get-Location) -Leaf
+$ScriptPath = Get-Location     # C:\PathToScript
+$ScriptFullPath = $MyInvocation.MyCommand.Path     # C:\PathToScript\Script.ps1
+$ScriptParentFolderName = Split-Path (Get-Location) -Leaf
 $WinDir = $Env:windir
 $ProgramData = $Env:ProgramData     # C:\ProgramData
 $ProgramFiles = $Env:ProgramFiles     # C:\Program Files
 $ProgramFilesX86 = ${Env:ProgramFiles(x86)}     # C:\Program Files (x86)
-
+$UserProfile = $HOME    # C:\Users\Username
+$UserDesktop = "$UserProfile\Desktop"    # C:\Users\Username\Desktop
+$UserAppData = $Env:APPDATA    # C:\Users\Username\AppData\Roaming
 
 # Upravit dle potreby
 $LogPath = $Env:SystemDrive + "\applogs"
@@ -35,6 +38,7 @@ $PackageName = ""
 # KONFIGURACE LOGOVANI
 #==============================================
 
+$LogToFile = $true
 $LogToCSV = $false
 if ($LogToCSV) {
     $LogExt = ".csv"
@@ -42,7 +46,7 @@ if ($LogToCSV) {
     $LogExt = ".log"
 }
 if ($PackageName -eq "" -or $PackageName -eq $null) {
-    $LogFile = $LogPath + "\" + $ScriptParentFolder + "_" + $ScriptName + $LogExt
+    $LogFile = $LogPath + "\" + $ScriptParentFolderName + "_" + $ScriptName + $LogExt
 } else {
     $LogFile = $LogPath + "\" + $PackageName + "_" + $ScriptName + $LogExt
 }
@@ -63,14 +67,20 @@ function LOG {
         [ValidateSet('INFO','WARN','ERROR')]
         [string]$Severity = 'INFO'
     )
-    if ($LogToCSV) {
-    [PSCustomObject]@{
-        Time = $Now
-        Severity = $Severity
-        Message = $Message
-    } | Export-Csv -Path $LogFile -Append -NoTypeInformation
+
+
+    if ($LogToFile) {
+        if ($LogToCSV) {
+            [PSCustomObject]@{
+            Time = $Now
+            Severity = $Severity
+            Message = $Message
+            } | Export-Csv -Path $LogFile -Append -NoTypeInformation
+        } else {
+            Add-content $LogFile -Value "$Now : $Severity : $Message"
+        }
     } else {
-        Add-content $LogFile -Value "$Now : $Severity : $Message"
+        Write-Host "$Message - $Severity"
     }
 }
 LOG -Message "Start $ScriptFullPath" -Severity INFO
@@ -146,8 +156,34 @@ function DELFOLDER {
         Remove-Item $FolderPathForDelete -Recurse
         LOG -Message "Function DELFOLDER : Folder $FolderPathForDelete deleted." -Severity INFO
     } else {
-        LOG -Message "Function DELFOLDER : Folder $FolderPathForDelete not found!" -Severity WARN
+        LOG -Message "Function DELFOLDER : Folder $FolderPathForDelete not found!" -Severity ERROR
     }    
+}
+
+function COPYFILE {
+    # Usage: COPYFILE "$ScriptPath\README.pdf" $UserDesktop
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [string]$CopyFilePath,
+
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [string]$DestinationFolderPath
+    )
+
+    if (Test-Path -Path $CopyFilePath) {
+        if (Test-Path -Path $DestinationFolderPath) {
+            Copy-Item $CopyFilePath -Destination $DestinationFolderPath
+            LOG -Message "Function COPYFILE : File $CopyFilePath was copied to $DestinationFolderPath" -Severity INFO
+        } else {
+            LOG -Message "Function COPYFILE : Folder $DestinationFolderPath not found!" -Severity ERROR
+        }
+    } else {
+        LOG -Message "Function COPYFILE : File $CopyFilePath not found!" -Severity ERROR
+    }
+    
 }
 
 
@@ -161,4 +197,10 @@ function DELFOLDER {
 #CREATEFOLDER "$ProgramFilesX86\TestFolder"
 #MESSAGE "Folder $ProgramFilesX86\TestFolder created!"
 #DELFOLDER "$ProgramFilesX86\TestFolder"
+#MESSAGE $ScriptParentFolderName
+#MESSAGE $ScriptFullPath
+#MESSAGE $ScriptPath
+#MESSAGE $UserDesktop
+#COPYFILE "$ScriptPath\README.md" $UserDesktop
+
 
