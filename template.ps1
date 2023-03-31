@@ -56,7 +56,7 @@ if ($PackageName -eq "" -or $PackageName -eq $null) {
 #==============================================
 
 function LOG {
-    [CmdletBinding()]
+    [CmdletBinding()] #<<-- This turns a regular function into an advanced function
     param (
         [Parameter()]
         [ValidateNotNullOrEmpty()]
@@ -203,6 +203,30 @@ function DELFILE {
     }
 }
 
+function REGEXISTS {
+    # Usage: REGEXISTS -RegKey "HKLM:\SOFTWARE\Key" -RegName "Name"
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [string]$RegKey,
+
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [string]$RegName
+    )
+    
+    $RegExists = Get-ItemProperty -Path $RegKey -Name $RegName -ErrorAction Ignore
+    
+    if ($RegExists) {
+        LOG -Message "Function REGEXISTS : $RegKey\$RegName found."
+        $true
+    } else {
+        LOG -Message "Function REGEXISTS : $RegKey\$RegName not found!" -Severity WARN
+        $false
+    }
+}
+
 #==============================================
 # YOUR COMMANDS
 #==============================================
@@ -218,6 +242,9 @@ function DELFILE {
 #MESSAGE $ScriptPath
 #MESSAGE $UserDesktop
 #COPYFILE "$ScriptPath\README.md" $UserDesktop
-DELFILE "$UserDesktop\README.md"
-
-
+#DELFILE "$UserDesktop\README.md"
+if (REGEXISTS -RegKey "HKLM:\SOFTWARE\7-Zip" -RegName "Path") {
+    MESSAGE "Regkey exists."
+} else {
+    MESSAGE "Regkey not found."
+}
