@@ -1,16 +1,16 @@
 # PowerShell Template
 # Author: Tomas Kadlec, info@tomkadlec.cz
-# Version 0.1
-# Vyplnit radek 22 promena "sPackageName"
+# Version 0.2
+# Fill variable $sPackageName line 35
 #----------------------------------------
-# AUTOR SCRIPTU :
-# DATUM         :
-# POPIS         :
+# SCRIPT AUTHOR :
+# DATE          :
+# DESCRIPTION   :
 #----------------------------------------
 #==============================================
-# NASTAVENI PROMENYCH, NEUPRAVOVAT
+# VARIABLES DEFINITION
 #==============================================
-# Seznam vsech systemovych promennych > Get-Childitem -Path Env:* | Sort-Object Name
+# List all system variables > Get-Childitem -Path Env:* | Sort-Object Name
 $ScriptName = $MyInvocation.MyCommand.Name
 $ScriptPath = Get-Location     # C:\PathToScript
 $ScriptFullPath = $MyInvocation.MyCommand.Path     # C:\PathToScript\Script.ps1
@@ -23,19 +23,19 @@ $UserProfile = $HOME    # C:\Users\Username
 $UserDesktop = "$UserProfile\Desktop"    # C:\Users\Username\Desktop
 $UserAppData = $Env:APPDATA    # C:\Users\Username\AppData\Roaming
 
-# Upravit dle potreby
+# Edit regarding your needs
 $LogPath = $Env:SystemDrive + "\applogs"
 $DateFormat = "dd.MM.yyyy HH:mm:ss"
 $Now = (Get-Date -f $DateFormat)
 
 #==============================================
-# NAZEV BALICKU
+# PACKAGE NAME
 #==============================================
 
 $PackageName = ""
 
 #==============================================
-# KONFIGURACE LOGOVANI
+# LOG FILE CONFIGURATION
 #==============================================
 
 $LogToFile = $true
@@ -52,7 +52,7 @@ if ($PackageName -eq "" -or $PackageName -eq $null) {
 }
 
 #==============================================
-# FUNKCE
+# FUNCTIONS
 #==============================================
 
 function LOG {
@@ -204,7 +204,7 @@ function DELFILE {
 }
 
 #==============================================
-# Script
+# YOUR COMMANDS
 #==============================================
 
 # Tests
