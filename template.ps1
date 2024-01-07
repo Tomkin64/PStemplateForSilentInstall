@@ -61,7 +61,6 @@ function LOG {
         [Parameter()]
         [ValidateNotNullOrEmpty()]
         [string]$Message,
- 
         [Parameter()]
         [ValidateNotNullOrEmpty()]
         [ValidateSet('INFO','WARN','ERROR')]
