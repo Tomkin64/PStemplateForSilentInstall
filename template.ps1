@@ -243,6 +243,8 @@ function REGEXISTS {
 #MESSAGE $UserDesktop
 #COPYFILE "$ScriptPath\README.md" $UserDesktop
 #DELFILE "$UserDesktop\README.md"
+
+# Example using REGEXISTS in if statement
 if (REGEXISTS -RegKey "HKLM:\SOFTWARE\7-Zip" -RegName "Path") {
     MESSAGE "Regkey exists."
 } else {
